@@ -2,7 +2,6 @@
 Módulo para buscar resultados históricos da Dupla Sena.
 """
 import requests
-from bs4 import BeautifulSoup
 from typing import List, Dict, Optional
 import json
 import os

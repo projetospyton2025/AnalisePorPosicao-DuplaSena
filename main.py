@@ -92,6 +92,7 @@ Exemplos de uso:
     
     elif args.buscar_range:
         inicio, fim = args.buscar_range
+        print(f"Buscando concursos de {inicio} até {fim}...")
         if inicio > fim:
             print("Erro: número inicial deve ser menor que o número final")
             sys.exit(1)

@@ -1,6 +1,11 @@
 #!/usr/bin/env python3
 """
 Script de exemplo demonstrando o uso dos módulos.
+
+Nota: Este script requer o arquivo 'exemplo_resultados.json'.
+Para criar dados de exemplo, você pode:
+1. Usar o comando: python main.py --buscar 10
+2. Ou criar manualmente um arquivo JSON com resultados de exemplo
 """
 from fetcher import DuplaSenaFetcher
 from analisador import AnalisePorPosicao

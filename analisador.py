@@ -64,7 +64,6 @@ class AnalisePorPosicao:
             # Estatísticas básicas
             counter = Counter(numeros)
             mais_frequentes = counter.most_common(10)
-            menos_frequentes = counter.most_common()[-10:]
             
             analise[posicao] = {
                 'posicao': posicao + 1,
@@ -76,8 +75,7 @@ class AnalisePorPosicao:
                 'maximo': max(numeros),
                 'total_ocorrencias': len(numeros),
                 'numeros_unicos': len(set(numeros)),
-                'mais_frequentes': mais_frequentes,
-                'menos_frequentes': menos_frequentes
+                'mais_frequentes': mais_frequentes
             }
         
         return analise
