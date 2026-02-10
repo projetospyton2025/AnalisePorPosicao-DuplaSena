@@ -1,0 +1,212 @@
+{% extends "base.html" %}
+
+{% block title %}Dia de Sorte - Gerar Palpites{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-lg-10 mx-auto">
+        <h2 class="text-center text-golden mb-4">
+            <i class="bi bi-lightbulb-fill me-2"></i>
+            Gerador de Palpites Inteligentes
+        </h2>
+
+        <!-- Form -->
+        <div class="card shadow-sm mb-4">
+            <div class="card-body">
+                <form id="form-palpites">
+                    <div class="row align-items-end">
+                        <div class="col-md-6">
+                            <label for="quantidade" class="form-label">Quantidade de Palpites</label>
+                            <select class="form-select" id="quantidade" name="quantidade">
+                                <option value="3">3 palpites</option>
+                                <option value="5" selected>5 palpites</option>
+                                <option value="8">8 palpites</option>
+                                <option value="10">10 palpites</option>
+                            </select>
+                        </div>
+                        <div class="col-md-6 mt-3 mt-md-0">
+                            <button type="submit" class="btn btn-golden w-100">
+                                <i class="bi bi-magic me-2"></i>
+                                Gerar Palpites
+                            </button>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+        <!-- Loading -->
+        <div id="loading" class="text-center my-5" style="display: none;">
+            <div class="spinner-border text-golden" role="status">
+                <span class="visually-hidden">Gerando palpites...</span>
+            </div>
+            <p class="mt-3">Analisando estatísticas e gerando palpites...</p>
+        </div>
+
+        <!-- Results -->
+        <div id="results" style="display: none;">
+            <h4 class="text-golden mb-3">
+                <i class="bi bi-check-circle-fill me-2"></i>
+                Palpites Gerados
+            </h4>
+            <div id="palpites-container" class="row g-3">
+                <!-- Preenchido via JavaScript -->
+            </div>
+
+            <!-- Action Buttons -->
+            <div class="text-center mt-4">
+                <button onclick="imprimirPalpites()" class="btn btn-outline-golden me-2">
+                    <i class="bi bi-printer-fill me-2"></i>
+                    Imprimir
+                </button>
+                <button onclick="gerarNovosPalpites()" class="btn btn-golden">
+                    <i class="bi bi-arrow-clockwise me-2"></i>
+                    Gerar Novos
+                </button>
+            </div>
+        </div>
+
+        <!-- Error -->
+        <div id="error" class="alert alert-danger" role="alert" style="display: none;">
+            <i class="bi bi-exclamation-triangle-fill me-2"></i>
+            <span id="error-message"></span>
+        </div>
+
+        <!-- Info -->
+        <div class="card shadow-sm mt-4">
+            <div class="card-body">
+                <h5 class="card-title text-golden">
+                    <i class="bi bi-info-circle-fill me-2"></i>
+                    Sobre os Palpites
+                </h5>
+                <p class="mb-2">Os palpites são gerados usando 5 estratégias diferentes:</p>
+                <ul class="mb-0">
+                    <li><strong>Balanceada:</strong> Combina dezenas frequentes e raras</li>
+                    <li><strong>Por Frequência:</strong> Baseada nas dezenas mais sorteadas</li>
+                    <li><strong>Por Faixas:</strong> Distribui entre baixas, médias e altas</li>
+                    <li><strong>Aleatória Inteligente:</strong> Aleatoriedade com peso estatístico</li>
+                    <li><strong>Mista:</strong> Combinação de todas as estratégias</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_scripts %}
+<script>
+const formPalpites = document.getElementById('form-palpites');
+
+formPalpites.addEventListener('submit', async function(e) {
+    e.preventDefault();
+    await gerarPalpites();
+});
+
+async function gerarPalpites() {
+    const quantidade = document.getElementById('quantidade').value;
+    
+    // Mostra loading
+    document.getElementById('loading').style.display = 'block';
+    document.getElementById('results').style.display = 'none';
+    document.getElementById('error').style.display = 'none';
+    
+    try {
+        const response = await fetch('/api/gerar-palpites', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({ quantidade: parseInt(quantidade) })
+        });
+        
+        const data = await response.json();
+        
+        if (data.erro) {
+            mostrarErro(data.erro);
+            return;
+        }
+        
+        renderizarPalpites(data.palpites);
+        
+        document.getElementById('loading').style.display = 'none';
+        document.getElementById('results').style.display = 'block';
+    } catch (error) {
+        mostrarErro('Erro ao gerar palpites: ' + error.message);
+    }
+}
+
+function renderizarPalpites(palpites) {
+    const container = document.getElementById('palpites-container');
+    container.innerHTML = '';
+    
+    palpites.forEach((palpite, index) => {
+        const col = document.createElement('div');
+        col.className = 'col-md-6 col-lg-4';
+        
+        const confiancaCor = {
+            'Alta': 'success',
+            'Média-Alta': 'info',
+            'Média': 'warning',
+            'Média-Baixa': 'secondary'
+        };
+        
+        const cor = confiancaCor[palpite.confianca] || 'secondary';
+        
+        col.innerHTML = `
+            <div class="card h-100 shadow-sm hover-card">
+                <div class="card-header bg-golden text-white">
+                    <h6 class="mb-0">
+                        <i class="bi bi-star-fill me-2"></i>
+                        Palpite ${index + 1}
+                    </h6>
+                </div>
+                <div class="card-body">
+                    <div class="mb-3">
+                        <div class="d-flex flex-wrap gap-2 justify-content-center">
+                            ${palpite.dezenas.map(d => `<span class="numero-sorteado">${d}</span>`).join('')}
+                        </div>
+                    </div>
+                    
+                    <div class="mb-2">
+                        <strong>Mês Sugerido:</strong>
+                        <span class="badge bg-golden">${palpite.mes_sugerido}</span>
+                    </div>
+                    
+                    <div class="mb-2">
+                        <strong>Estratégia:</strong>
+                        <span class="text-muted">${palpite.estrategia}</span>
+                    </div>
+                    
+                    <div class="mb-2">
+                        <strong>Confiança:</strong>
+                        <span class="badge bg-${cor}">${palpite.confianca}</span>
+                    </div>
+                    
+                    <hr>
+                    
+                    <small class="text-muted">
+                        <i class="bi bi-info-circle me-1"></i>
+                        ${palpite.justificativa}
+                    </small>
+                </div>
+            </div>
+        `;
+        container.appendChild(col);
+    });
+}
+
+function mostrarErro(mensagem) {
+    document.getElementById('loading').style.display = 'none';
+    document.getElementById('error-message').textContent = mensagem;
+    document.getElementById('error').style.display = 'block';
+}
+
+function gerarNovosPalpites() {
+    formPalpites.dispatchEvent(new Event('submit'));
+}
+
+function imprimirPalpites() {
+    window.print();
+}
+</script>
+{% endblock %}

@@ -1,0 +1,185 @@
+{% extends "base.html" %}
+
+{% block title %}Dia de Sorte - Análise Estatística{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-lg-10 mx-auto">
+        <h2 class="text-center text-golden mb-4">
+            <i class="bi bi-bar-chart-fill me-2"></i>
+            Análise Estatística
+        </h2>
+
+        <!-- Loading -->
+        <div id="loading" class="text-center my-5">
+            <div class="spinner-border text-golden" role="status">
+                <span class="visually-hidden">Carregando...</span>
+            </div>
+            <p class="mt-3">Analisando dados dos últimos concursos...</p>
+        </div>
+
+        <!-- Content (hidden initially) -->
+        <div id="content" style="display: none;">
+            <!-- Frequência de Dezenas -->
+            <div class="card shadow-sm mb-4">
+                <div class="card-header bg-golden text-white">
+                    <h5 class="mb-0">
+                        <i class="bi bi-123 me-2"></i>
+                        Frequência de Dezenas
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <p class="text-muted">Dezenas mais e menos sorteadas (últimos 100 concursos)</p>
+                    <div id="frequencia-dezenas" class="row g-2">
+                        <!-- Preenchido via JavaScript -->
+                    </div>
+                </div>
+            </div>
+
+            <!-- Distribuição por Faixas -->
+            <div class="card shadow-sm mb-4">
+                <div class="card-header bg-golden text-white">
+                    <h5 class="mb-0">
+                        <i class="bi bi-pie-chart-fill me-2"></i>
+                        Distribuição por Faixas
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <div id="distribuicao-faixas" class="row g-3">
+                        <!-- Preenchido via JavaScript -->
+                    </div>
+                </div>
+            </div>
+
+            <!-- Mês da Sorte -->
+            <div class="card shadow-sm mb-4">
+                <div class="card-header bg-golden text-white">
+                    <h5 class="mb-0">
+                        <i class="bi bi-calendar-month-fill me-2"></i>
+                        Frequência do Mês da Sorte
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <div id="meses-sorte" class="row g-2">
+                        <!-- Preenchido via JavaScript -->
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Error -->
+        <div id="error" class="alert alert-danger" role="alert" style="display: none;">
+            <i class="bi bi-exclamation-triangle-fill me-2"></i>
+            <span id="error-message"></span>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_scripts %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    carregarAnalise();
+});
+
+async function carregarAnalise() {
+    try {
+        const response = await fetch('/api/analise-estatistica?limite=100');
+        const data = await response.json();
+        
+        if (data.erro) {
+            mostrarErro(data.erro);
+            return;
+        }
+        
+        renderizarFrequenciaDezenas(data.frequencia_dezenas);
+        renderizarDistribuicaoFaixas(data.distribuicao_faixas);
+        renderizarMesesSorte(data.meses_sorte);
+        
+        document.getElementById('loading').style.display = 'none';
+        document.getElementById('content').style.display = 'block';
+    } catch (error) {
+        mostrarErro('Erro ao carregar análise: ' + error.message);
+    }
+}
+
+function renderizarFrequenciaDezenas(frequencias) {
+    const container = document.getElementById('frequencia-dezenas');
+    container.innerHTML = '';
+    
+    frequencias.forEach(item => {
+        const col = document.createElement('div');
+        col.className = 'col-6 col-sm-4 col-md-3 col-lg-2';
+        
+        // Determina cor baseada na frequência
+        let corClass = 'bg-light';
+        if (item.frequencia > 250) corClass = 'bg-success';
+        else if (item.frequencia > 240) corClass = 'bg-info';
+        else if (item.frequencia > 230) corClass = 'bg-warning';
+        
+        col.innerHTML = `
+            <div class="p-2 border rounded text-center ${corClass}">
+                <div class="fw-bold">${item.dezena}</div>
+                <small class="text-muted">${item.frequencia}x</small>
+            </div>
+        `;
+        container.appendChild(col);
+    });
+}
+
+function renderizarDistribuicaoFaixas(faixas) {
+    const container = document.getElementById('distribuicao-faixas');
+    container.innerHTML = '';
+    
+    const faixasArray = [
+        {nome: 'Baixas', dados: faixas.baixas, cor: 'info'},
+        {nome: 'Médias', dados: faixas.medias, cor: 'warning'},
+        {nome: 'Altas', dados: faixas.altas, cor: 'danger'}
+    ];
+    
+    faixasArray.forEach(faixa => {
+        const col = document.createElement('div');
+        col.className = 'col-md-4';
+        col.innerHTML = `
+            <div class="card h-100 border-${faixa.cor}">
+                <div class="card-body text-center">
+                    <h5 class="card-title text-${faixa.cor}">${faixa.nome}</h5>
+                    <p class="card-text">
+                        <strong>${faixa.dados.range}</strong>
+                    </p>
+                    <div class="display-6 text-${faixa.cor}">${faixa.dados.percentual}%</div>
+                    <small class="text-muted">${faixa.dados.count} dezenas sorteadas</small>
+                </div>
+            </div>
+        `;
+        container.appendChild(col);
+    });
+}
+
+function renderizarMesesSorte(meses) {
+    const container = document.getElementById('meses-sorte');
+    container.innerHTML = '';
+    
+    meses.forEach(item => {
+        const col = document.createElement('div');
+        col.className = 'col-6 col-sm-4 col-md-3';
+        
+        col.innerHTML = `
+            <div class="p-3 border rounded text-center hover-card">
+                <div class="fw-bold text-golden">${item.mes}</div>
+                <div class="mt-2">
+                    <span class="badge bg-golden">${item.frequencia} vezes</span>
+                </div>
+            </div>
+        `;
+        container.appendChild(col);
+    });
+}
+
+function mostrarErro(mensagem) {
+    document.getElementById('loading').style.display = 'none';
+    document.getElementById('error-message').textContent = mensagem;
+    document.getElementById('error').style.display = 'block';
+}
+</script>
+{% endblock %}
