@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 # Análise Por Posição - Dupla Sena
 
 Aplicação web para análise estatística dos resultados da Dupla Sena por posição dos números sorteados.
@@ -217,3 +218,6 @@ Projeto desenvolvido por projetospython2025
 ---
 
 ⭐ Se este projeto foi útil para você, considere dar uma estrela no GitHub!
+=======
+A
+>>>>>>> 92a548fba3c714403ad6019eb255c32ddf907373
