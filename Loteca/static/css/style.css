@@ -1,0 +1,145 @@
+/* Loteca Custom Styles */
+
+:root {
+    --primary-blue: #0066B3;
+    --primary-red: #F81A03;
+    --light-gray: #F9FBFA;
+}
+
+body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background-color: var(--light-gray);
+}
+
+.navbar-dark.bg-primary {
+    background-color: var(--primary-blue) !important;
+}
+
+.bg-primary {
+    background-color: var(--primary-blue) !important;
+}
+
+.btn-primary {
+    background-color: var(--primary-blue);
+    border-color: var(--primary-blue);
+}
+
+.btn-primary:hover {
+    background-color: #005799;
+    border-color: #005799;
+}
+
+.bg-danger, .btn-danger {
+    background-color: var(--primary-red) !important;
+    border-color: var(--primary-red) !important;
+}
+
+.btn-danger:hover {
+    background-color: #e31902 !important;
+    border-color: #e31902 !important;
+}
+
+.text-primary {
+    color: var(--primary-blue) !important;
+}
+
+.text-danger {
+    color: var(--primary-red) !important;
+}
+
+.logo-img {
+    display: block;
+    margin: auto;
+    width: 200px;
+    height: 100px;
+    opacity: 0.5;
+    transition: opacity 0.3s;
+}
+
+.logo-img:hover {
+    opacity: 1.0;
+}
+
+.card {
+    border-radius: 10px;
+    border: none;
+}
+
+.card-header {
+    border-radius: 10px 10px 0 0 !important;
+}
+
+.table-primary {
+    background-color: var(--primary-blue);
+    color: white;
+}
+
+.table-danger {
+    background-color: var(--primary-red);
+    color: white;
+}
+
+.footer {
+    background-color: #f8f9fa;
+    margin-top: 50px;
+}
+
+.badge.bg-primary {
+    background-color: var(--primary-blue) !important;
+}
+
+.badge.bg-danger {
+    background-color: var(--primary-red) !important;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+    .logo-img {
+        width: 150px;
+        height: 75px;
+    }
+    
+    .table {
+        font-size: 0.875rem;
+    }
+}
+
+/* Print styles */
+@media print {
+    .navbar, .footer, .btn, button {
+        display: none !important;
+    }
+    
+    .card {
+        border: 2px solid #000 !important;
+        page-break-inside: avoid;
+    }
+    
+    body {
+        background-color: white;
+    }
+}
+
+/* Animation for loading */
+.spinner-border {
+    width: 3rem;
+    height: 3rem;
+}
+
+/* Table hover effect */
+.table-hover tbody tr:hover {
+    background-color: rgba(0, 102, 179, 0.1);
+}
+
+/* Alert styles */
+.alert-info {
+    background-color: #cce9ff;
+    border-color: #99d3ff;
+    color: #003a66;
+}
+
+.alert-warning {
+    background-color: #fff3cd;
+    border-color: #ffc107;
+    color: #856404;
+}

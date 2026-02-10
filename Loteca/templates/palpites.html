@@ -1,0 +1,218 @@
+{% extends "base.html" %}
+
+{% block title %}Loteca - Gerar Palpites{% endblock %}
+
+{% block content %}
+<div class="row mb-4">
+    <div class="col-12">
+        <h2><i class="bi bi-lightbulb-fill"></i> Gerar Palpites Inteligentes</h2>
+        <p class="text-muted">Escolha uma estratégia e gere palpites baseados em análise estatística</p>
+    </div>
+</div>
+
+<div class="row mb-4">
+    <div class="col-md-8 mx-auto">
+        <div class="card shadow-sm">
+            <div class="card-header bg-primary text-white">
+                <h5 class="mb-0"><i class="bi bi-gear-fill"></i> Configurações</h5>
+            </div>
+            <div class="card-body">
+                <div class="mb-3">
+                    <label for="estrategiaSelect" class="form-label"><strong>Estratégia:</strong></label>
+                    <select class="form-select" id="estrategiaSelect">
+                        <option value="equilibrado" selected>Equilibrado - Baseado em estatísticas gerais</option>
+                        <option value="mandante">Favorito Mandante - Prioriza vitórias em casa</option>
+                        <option value="empates">Empates Estratégicos - Inclui mais empates</option>
+                        <option value="visitante">Força Visitante - Aposta em visitantes</option>
+                        <option value="zebra">Zebra - Resultados improváveis (alto risco)</option>
+                    </select>
+                </div>
+                <button class="btn btn-danger btn-lg w-100" onclick="gerarPalpites()">
+                    <i class="bi bi-lightbulb-fill"></i> Gerar Palpites
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div id="loadingPalpites" class="text-center my-5" style="display: none;">
+    <div class="spinner-border text-danger" role="status">
+        <span class="visually-hidden">Gerando palpites...</span>
+    </div>
+    <p class="mt-2">Analisando dados e gerando palpites...</p>
+</div>
+
+<div id="palpitesResult" style="display: none;">
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="card shadow-sm">
+                <div class="card-header bg-danger text-white d-flex justify-content-between align-items-center">
+                    <h5 class="mb-0"><i class="bi bi-card-checklist"></i> Seus Palpites</h5>
+                    <button class="btn btn-light btn-sm" onclick="window.print()">
+                        <i class="bi bi-printer-fill"></i> Imprimir
+                    </button>
+                </div>
+                <div class="card-body">
+                    <div id="palpitesInfo" class="mb-4"></div>
+                    <div id="palpitesTable"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+function gerarPalpites() {
+    const estrategia = document.getElementById('estrategiaSelect').value;
+    
+    document.getElementById('loadingPalpites').style.display = 'block';
+    document.getElementById('palpitesResult').style.display = 'none';
+    
+    fetch('/api/gerar-palpites', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({ estrategia: estrategia })
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.error) {
+            mostrarErro(data.error);
+            return;
+        }
+        mostrarPalpites(data);
+        document.getElementById('loadingPalpites').style.display = 'none';
+        document.getElementById('palpitesResult').style.display = 'block';
+    })
+    .catch(error => {
+        mostrarErro('Erro ao gerar palpites: ' + error.message);
+        document.getElementById('loadingPalpites').style.display = 'none';
+    });
+}
+
+function mostrarPalpites(data) {
+    // Informações gerais
+    const infoDiv = document.getElementById('palpitesInfo');
+    infoDiv.innerHTML = `
+        <div class="row">
+            <div class="col-md-6">
+                <p class="mb-1"><strong>Concurso:</strong> ${data.concurso}</p>
+                <p class="mb-1"><strong>Estratégia:</strong> ${data.estrategia}</p>
+            </div>
+            <div class="col-md-6 text-md-end">
+                <p class="mb-1"><strong>Confiança Geral:</strong> 
+                    <span class="badge ${getConfiancaClass(data.confianca_geral)}">${(data.confianca_geral * 100).toFixed(0)}%</span>
+                </p>
+                <p class="mb-1"><strong>Total de Jogos:</strong> ${data.jogos_palpites.length}</p>
+            </div>
+        </div>
+        <div class="alert alert-info mt-3">
+            <strong>Justificativa:</strong> ${data.justificativa}
+        </div>
+    `;
+    
+    // Tabela de palpites
+    const tableDiv = document.getElementById('palpitesTable');
+    let html = `
+        <div class="table-responsive">
+            <table class="table table-bordered table-hover">
+                <thead class="table-danger">
+                    <tr>
+                        <th>Jogo</th>
+                        <th>Time 1</th>
+                        <th class="text-center" width="80">Coluna 1</th>
+                        <th class="text-center" width="80">Meio</th>
+                        <th class="text-center" width="80">Coluna 2</th>
+                        <th>Time 2</th>
+                        <th class="text-center">Confiança</th>
+                    </tr>
+                </thead>
+                <tbody>
+    `;
+    
+    data.jogos_palpites.forEach(palpite => {
+        const col1Class = palpite.palpite === '1' ? 'bg-primary text-white' : '';
+        const colXClass = palpite.palpite === 'X' ? 'bg-secondary text-white' : '';
+        const col2Class = palpite.palpite === '2' ? 'bg-danger text-white' : '';
+        
+        html += `
+            <tr>
+                <td class="text-center"><strong>${palpite.jogo}</strong></td>
+                <td>${palpite.time_um}</td>
+                <td class="text-center ${col1Class}">
+                    ${palpite.palpite === '1' ? '<i class="bi bi-check-lg"></i> 1' : '1'}
+                </td>
+                <td class="text-center ${colXClass}">
+                    ${palpite.palpite === 'X' ? '<i class="bi bi-check-lg"></i> X' : 'X'}
+                </td>
+                <td class="text-center ${col2Class}">
+                    ${palpite.palpite === '2' ? '<i class="bi bi-check-lg"></i> 2' : '2'}
+                </td>
+                <td>${palpite.time_dois}</td>
+                <td class="text-center">
+                    <span class="badge ${getConfiancaClass(palpite.confianca)}">
+                        ${(palpite.confianca * 100).toFixed(0)}%
+                    </span>
+                    <small class="d-block text-muted mt-1">${palpite.justificativa}</small>
+                </td>
+            </tr>
+        `;
+    });
+    
+    html += `
+                </tbody>
+            </table>
+        </div>
+        
+        <div class="alert alert-warning mt-3">
+            <strong><i class="bi bi-exclamation-triangle-fill"></i> Atenção:</strong> 
+            Os palpites são baseados em análise estatística e não garantem acertos. 
+            Jogue com responsabilidade!
+        </div>
+        
+        <div class="row mt-3">
+            <div class="col-12 text-center">
+                <button class="btn btn-danger" onclick="gerarPalpites()">
+                    <i class="bi bi-arrow-repeat"></i> Gerar Novos Palpites
+                </button>
+                <button class="btn btn-primary" onclick="window.print()">
+                    <i class="bi bi-printer-fill"></i> Imprimir Palpites
+                </button>
+            </div>
+        </div>
+    `;
+    
+    tableDiv.innerHTML = html;
+}
+
+function getConfiancaClass(confianca) {
+    if (confianca >= 0.70) return 'bg-success';
+    if (confianca >= 0.55) return 'bg-warning';
+    return 'bg-danger';
+}
+
+function mostrarErro(mensagem) {
+    document.getElementById('loadingPalpites').innerHTML = `
+        <div class="alert alert-danger">
+            <i class="bi bi-exclamation-triangle-fill"></i> ${mensagem}
+        </div>
+    `;
+    document.getElementById('loadingPalpites').style.display = 'block';
+}
+</script>
+
+<style>
+@media print {
+    .navbar, .footer, button, .btn {
+        display: none !important;
+    }
+    .card {
+        border: 2px solid #000 !important;
+        page-break-inside: avoid;
+    }
+}
+</style>
+{% endblock %}

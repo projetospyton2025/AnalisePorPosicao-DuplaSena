@@ -1,0 +1,156 @@
+{% extends "base.html" %}
+
+{% block title %}Loteca - Início{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-12">
+        <div class="card shadow-sm mb-4">
+            <div class="card-header bg-primary text-white">
+                <h4 class="mb-0"><i class="bi bi-trophy-fill"></i> Último Concurso</h4>
+            </div>
+            <div class="card-body" id="ultimoConcursoCard">
+                <div class="text-center">
+                    <div class="spinner-border text-primary" role="status">
+                        <span class="visually-hidden">Carregando...</span>
+                    </div>
+                    <p class="mt-2">Buscando dados do último concurso...</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-md-6">
+        <div class="card shadow-sm mb-4">
+            <div class="card-body text-center">
+                <i class="bi bi-bar-chart-fill text-primary display-1"></i>
+                <h5 class="card-title mt-3">Análise Estatística</h5>
+                <p class="card-text">Veja estatísticas detalhadas, desempenho de times e histórico de confrontos.</p>
+                <a href="{{ url_for('main.analise') }}" class="btn btn-primary">
+                    <i class="bi bi-arrow-right-circle"></i> Acessar Análise
+                </a>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-6">
+        <div class="card shadow-sm mb-4">
+            <div class="card-body text-center">
+                <i class="bi bi-lightbulb-fill text-danger display-1"></i>
+                <h5 class="card-title mt-3">Gerar Palpites</h5>
+                <p class="card-text">Gere palpites inteligentes baseados em análise estatística e diferentes estratégias.</p>
+                <a href="{{ url_for('main.palpites') }}" class="btn btn-danger">
+                    <i class="bi bi-arrow-right-circle"></i> Gerar Palpites
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    carregarUltimoConcurso();
+});
+
+function carregarUltimoConcurso() {
+    fetch('/api/ultimo-concurso')
+        .then(response => response.json())
+        .then(data => {
+            if (data.error) {
+                mostrarErro(data.error);
+                return;
+            }
+            mostrarConcurso(data);
+        })
+        .catch(error => {
+            mostrarErro('Erro ao carregar dados: ' + error.message);
+        });
+}
+
+function mostrarConcurso(data) {
+    const card = document.getElementById('ultimoConcursoCard');
+    
+    let html = `
+        <div class="row mb-3">
+            <div class="col-md-6">
+                <h5>Concurso: <span class="badge bg-primary">${data.numero}</span></h5>
+                <p class="mb-1"><strong>Data:</strong> ${data.dataApuracao}</p>
+                <p class="mb-1"><strong>Próximo Concurso:</strong> ${data.dataProximoConcurso}</p>
+            </div>
+            <div class="col-md-6 text-md-end">
+                <p class="mb-1"><strong>Valor Arrecadado:</strong> R$ ${formatarValor(data.valorArrecadado)}</p>
+                <p class="mb-1"><strong>Acumulado:</strong> R$ ${formatarValor(data.valorAcumulado)}</p>
+                <p class="mb-1"><strong>Estimativa Próximo:</strong> R$ ${formatarValor(data.valorEstimadoProximo)}</p>
+            </div>
+        </div>
+        
+        <div class="row mb-3">
+            <div class="col-12">
+                <div class="alert alert-info">
+                    <strong>Distribuição de Resultados:</strong>
+                    Coluna 1: ${data.totalColuna1} jogos | 
+                    Empates: ${data.totalEmpates} jogos | 
+                    Coluna 2: ${data.totalColuna2} jogos
+                </div>
+            </div>
+        </div>
+        
+        <div class="table-responsive">
+            <table class="table table-striped table-hover">
+                <thead class="table-primary">
+                    <tr>
+                        <th>Jogo</th>
+                        <th>Time 1</th>
+                        <th>Placar</th>
+                        <th>Time 2</th>
+                        <th class="text-center">Resultado</th>
+                    </tr>
+                </thead>
+                <tbody>
+    `;
+    
+    data.jogos.forEach(jogo => {
+        const resultadoClass = jogo.resultado === '1' ? 'badge bg-primary' :
+                               jogo.resultado === 'X' ? 'badge bg-secondary' :
+                               jogo.resultado === '2' ? 'badge bg-danger' : 'badge bg-light text-dark';
+        
+        html += `
+            <tr>
+                <td><strong>${jogo.sequencial}</strong></td>
+                <td>${jogo.timeUm} (${jogo.ufUm})</td>
+                <td class="text-center"><strong>${jogo.placar}</strong></td>
+                <td>${jogo.timeDois} (${jogo.ufDois})</td>
+                <td class="text-center"><span class="${resultadoClass}">${jogo.resultado}</span></td>
+            </tr>
+        `;
+    });
+    
+    html += `
+                </tbody>
+            </table>
+        </div>
+    `;
+    
+    card.innerHTML = html;
+}
+
+function mostrarErro(mensagem) {
+    const card = document.getElementById('ultimoConcursoCard');
+    card.innerHTML = `
+        <div class="alert alert-danger">
+            <i class="bi bi-exclamation-triangle-fill"></i> ${mensagem}
+        </div>
+    `;
+}
+
+function formatarValor(valor) {
+    return new Intl.NumberFormat('pt-BR', {
+        minimumFractionDigits: 2,
+        maximumFractionDigits: 2
+    }).format(valor);
+}
+</script>
+{% endblock %}
