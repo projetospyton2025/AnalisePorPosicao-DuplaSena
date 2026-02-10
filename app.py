@@ -1,6 +1,7 @@
 """
 Aplicação Flask - Análise Por Posição Dupla Sena
 """
+import os
 from flask import Flask
 from routes.main import main_bp
 
@@ -10,7 +11,7 @@ def create_app():
     app = Flask(__name__)
     
     # Configurações
-    app.config['SECRET_KEY'] = 'dupla-sena-analise-por-posicao-2026'
+    app.config['SECRET_KEY'] = os.environ.get('SECRET_KEY', 'dev-key-change-in-production')
     app.config['JSON_AS_ASCII'] = False
     
     # Registra blueprints

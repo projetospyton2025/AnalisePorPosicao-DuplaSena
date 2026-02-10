@@ -1,4 +1,35 @@
 // Script para página de análise
+
+// Função para mostrar notificação
+function showNotification(message, type = 'danger') {
+    const toastHtml = `
+        <div class="toast align-items-center text-white bg-${type} border-0" role="alert" aria-live="assertive" aria-atomic="true">
+            <div class="d-flex">
+                <div class="toast-body">
+                    ${message}
+                </div>
+                <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast" aria-label="Close"></button>
+            </div>
+        </div>
+    `;
+    
+    let toastContainer = document.querySelector('.toast-container');
+    if (!toastContainer) {
+        toastContainer = document.createElement('div');
+        toastContainer.className = 'toast-container position-fixed top-0 end-0 p-3';
+        document.body.appendChild(toastContainer);
+    }
+    
+    toastContainer.insertAdjacentHTML('beforeend', toastHtml);
+    const toastElement = toastContainer.lastElementChild;
+    const toast = new bootstrap.Toast(toastElement);
+    toast.show();
+    
+    toastElement.addEventListener('hidden.bs.toast', () => {
+        toastElement.remove();
+    });
+}
+
 document.addEventListener('DOMContentLoaded', function() {
     const tipoBusca = document.getElementById('tipo-busca');
     const opcaoUltimos = document.getElementById('opcao-ultimos');
@@ -52,7 +83,7 @@ document.addEventListener('DOMContentLoaded', function() {
             loading.style.display = 'none';
             
             if (data.erro) {
-                alert('Erro: ' + data.erro);
+                showNotification('Erro: ' + data.erro, 'danger');
                 return;
             }
             
@@ -61,7 +92,7 @@ document.addEventListener('DOMContentLoaded', function() {
         .catch(error => {
             loading.style.display = 'none';
             console.error('Erro:', error);
-            alert('Erro ao realizar análise');
+            showNotification('Erro ao realizar análise. Tente novamente.', 'danger');
         });
     }
     

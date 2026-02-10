@@ -27,8 +27,14 @@ class DuplaSenaService:
             response.raise_for_status()
             data = response.json()
             return Concurso.from_api_response(data)
+        except requests.exceptions.Timeout:
+            print(f"Erro: Timeout ao buscar último concurso")
+            return None
+        except requests.exceptions.RequestException as e:
+            print(f"Erro de rede ao buscar último concurso: {e}")
+            return None
         except Exception as e:
-            print(f"Erro ao buscar último concurso: {e}")
+            print(f"Erro inesperado ao buscar último concurso: {e}")
             return None
     
     def buscar_concurso(self, numero: int) -> Optional[Concurso]:
@@ -47,8 +53,17 @@ class DuplaSenaService:
             response.raise_for_status()
             data = response.json()
             return Concurso.from_api_response(data)
+        except requests.exceptions.Timeout:
+            print(f"Erro: Timeout ao buscar concurso {numero}")
+            return None
+        except requests.exceptions.HTTPError as e:
+            print(f"Erro HTTP ao buscar concurso {numero}: {e.response.status_code}")
+            return None
+        except requests.exceptions.RequestException as e:
+            print(f"Erro de rede ao buscar concurso {numero}: {e}")
+            return None
         except Exception as e:
-            print(f"Erro ao buscar concurso {numero}: {e}")
+            print(f"Erro inesperado ao buscar concurso {numero}: {e}")
             return None
     
     def buscar_multiplos_concursos(self, inicio: int, fim: int) -> List[Concurso]:
