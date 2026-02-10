@@ -1,0 +1,110 @@
+{% extends "base.html" %}
+
+{% block title %}Dia de Sorte - Início{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-lg-8 mx-auto">
+        <!-- Welcome Card -->
+        <div class="card shadow-sm mb-4">
+            <div class="card-body text-center">
+                <h1 class="card-title text-golden">
+                    <i class="bi bi-calendar-event-fill"></i>
+                    Bem-vindo ao Dia de Sorte
+                </h1>
+                <p class="lead">Análise estatística e geração inteligente de palpites</p>
+            </div>
+        </div>
+
+        <!-- Último Concurso -->
+        {% if concurso %}
+        <div class="card shadow-sm mb-4">
+            <div class="card-header bg-golden text-white">
+                <h5 class="mb-0">
+                    <i class="bi bi-trophy-fill me-2"></i>
+                    Último Concurso - Nº {{ concurso.numero }}
+                </h5>
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-md-6">
+                        <p><strong>Data do Sorteio:</strong> {{ concurso.data_sorteio }}</p>
+                        <p><strong>Mês da Sorte:</strong> 
+                            <span class="badge bg-golden">{{ concurso.mes_sorte }}</span>
+                        </p>
+                    </div>
+                    <div class="col-md-6">
+                        <p><strong>Próximo Concurso:</strong> {{ concurso.numero_proximo_concurso }}</p>
+                        <p><strong>Data:</strong> {{ concurso.data_proximo_concurso }}</p>
+                    </div>
+                </div>
+
+                <h6 class="mt-3 mb-3">Dezenas Sorteadas:</h6>
+                <div class="d-flex flex-wrap gap-2 justify-content-center">
+                    {% for dezena in concurso.dezenas %}
+                    <span class="numero-sorteado">{{ dezena }}</span>
+                    {% endfor %}
+                </div>
+
+                {% if concurso.acumulado %}
+                <div class="alert alert-warning mt-3" role="alert">
+                    <i class="bi bi-exclamation-triangle-fill me-2"></i>
+                    <strong>Acumulado!</strong> Prêmio estimado para o próximo concurso: 
+                    R$ {{ "{:,.2f}".format(concurso.valor_acumulado_proximo) }}
+                </div>
+                {% endif %}
+            </div>
+        </div>
+        {% endif %}
+
+        <!-- Features -->
+        <div class="row g-3">
+            <div class="col-md-6">
+                <div class="card h-100 shadow-sm hover-card">
+                    <div class="card-body text-center">
+                        <i class="bi bi-bar-chart-fill display-4 text-golden"></i>
+                        <h5 class="card-title mt-3">Análise Estatística</h5>
+                        <p class="card-text">
+                            Veja frequências, padrões e estatísticas detalhadas dos sorteios
+                        </p>
+                        <a href="{{ url_for('main.analise') }}" class="btn btn-golden">
+                            Ver Análise <i class="bi bi-arrow-right"></i>
+                        </a>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-md-6">
+                <div class="card h-100 shadow-sm hover-card">
+                    <div class="card-body text-center">
+                        <i class="bi bi-lightbulb-fill display-4 text-golden"></i>
+                        <h5 class="card-title mt-3">Gerar Palpites</h5>
+                        <p class="card-text">
+                            Obtenha palpites inteligentes baseados em análise estatística
+                        </p>
+                        <a href="{{ url_for('main.palpites') }}" class="btn btn-golden">
+                            Gerar Palpites <i class="bi bi-arrow-right"></i>
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Info Section -->
+        <div class="card shadow-sm mt-4">
+            <div class="card-body">
+                <h5 class="card-title text-golden">
+                    <i class="bi bi-info-circle-fill me-2"></i>
+                    Sobre o Dia de Sorte
+                </h5>
+                <ul class="mb-0">
+                    <li>São sorteados <strong>7 números</strong> de 1 a 31</li>
+                    <li>É sorteado também um <strong>Mês da Sorte</strong></li>
+                    <li>Sorteios realizados às <strong>terças, quintas e sábados</strong></li>
+                    <li>Ganhe com 7, 6, 5 ou 4 acertos, ou acertando o Mês da Sorte</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
