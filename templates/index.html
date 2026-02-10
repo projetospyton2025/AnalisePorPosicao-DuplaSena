@@ -1,0 +1,127 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="row">
+    <div class="col-12">
+        <div class="jumbotron bg-light p-5 rounded-3 mb-4">
+            <h1 class="display-4">Análise Por Posição - Dupla Sena</h1>
+            <p class="lead">Sistema de análise estatística dos resultados da Dupla Sena por posição dos números sorteados.</p>
+            <hr class="my-4">
+            <p>Analise a frequência e distribuição dos números em cada uma das 6 posições dos sorteios.</p>
+            <a class="btn btn-primary btn-lg" href="/analise" role="button">Iniciar Análise</a>
+        </div>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-md-6 mb-4">
+        <div class="card">
+            <div class="card-body">
+                <h5 class="card-title">📊 Análise Estatística</h5>
+                <p class="card-text">
+                    Análise completa por posição incluindo:
+                </p>
+                <ul>
+                    <li>Média, mediana e moda</li>
+                    <li>Desvio padrão</li>
+                    <li>Números mais frequentes</li>
+                    <li>Distribuição por posição</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-md-6 mb-4">
+        <div class="card">
+            <div class="card-body">
+                <h5 class="card-title">🎯 Sugestões Inteligentes</h5>
+                <p class="card-text">
+                    Sugestões baseadas em análise histórica:
+                </p>
+                <ul>
+                    <li>Top 5 números por posição</li>
+                    <li>Análise dos dois sorteios</li>
+                    <li>Baseado em frequência real</li>
+                    <li>Atualizações automáticas</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-header bg-info text-white">
+                <h5 class="mb-0">🎲 Último Concurso</h5>
+            </div>
+            <div class="card-body">
+                <div id="ultimo-concurso">
+                    <div class="text-center">
+                        <div class="spinner-border text-primary" role="status">
+                            <span class="visually-hidden">Carregando...</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row mt-4">
+    <div class="col-12">
+        <div class="alert alert-info">
+            <h5 class="alert-heading">ℹ️ Sobre a Dupla Sena</h5>
+            <p class="mb-0">
+                A Dupla Sena é uma loteria brasileira onde são sorteados 6 números de 1 a 50 em dois sorteios por concurso.
+                Esta ferramenta analisa a posição de cada número sorteado (do menor ao maior) para identificar padrões estatísticos.
+            </p>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+// Buscar último concurso
+fetch('/api/ultimo-concurso')
+    .then(response => response.json())
+    .then(data => {
+        if (data.erro) {
+            document.getElementById('ultimo-concurso').innerHTML = 
+                '<div class="alert alert-danger">Erro ao carregar último concurso</div>';
+            return;
+        }
+        
+        const html = `
+            <div class="row">
+                <div class="col-md-6">
+                    <h6>Concurso #${data.numero}</h6>
+                    <p class="text-muted">Data: ${data.dataApuracao || data.data}</p>
+                </div>
+                <div class="col-md-6">
+                    <h6>1º Sorteio</h6>
+                    <div class="d-flex gap-2 mb-3">
+                        ${data.dezenas_sorteio1.map(n => 
+                            `<span class="badge bg-primary fs-6">${n}</span>`
+                        ).join('')}
+                    </div>
+                    <h6>2º Sorteio</h6>
+                    <div class="d-flex gap-2">
+                        ${data.dezenas_sorteio2.map(n => 
+                            `<span class="badge bg-success fs-6">${n}</span>`
+                        ).join('')}
+                    </div>
+                </div>
+            </div>
+        `;
+        
+        document.getElementById('ultimo-concurso').innerHTML = html;
+    })
+    .catch(error => {
+        console.error('Erro:', error);
+        document.getElementById('ultimo-concurso').innerHTML = 
+            '<div class="alert alert-danger">Erro ao carregar último concurso</div>';
+    });
+</script>
+{% endblock %}

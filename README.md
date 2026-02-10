@@ -1,18 +1,48 @@
 # Análise Por Posição - Dupla Sena
 
-Uma ferramenta Python para análise estatística dos resultados da Dupla Sena por posição dos números sorteados.
+Aplicação web para análise estatística dos resultados da Dupla Sena por posição dos números sorteados.
 
 ## 📊 Descrição
 
-Este projeto realiza análise estatística dos resultados históricos da Dupla Sena, focando especificamente na posição de cada número sorteado. A Dupla Sena sorteia 6 números de 1 a 50 em dois sorteios por concurso. Esta ferramenta analisa a frequência e distribuição dos números em cada uma das 6 posições (do menor ao maior número sorteado).
+Este projeto é uma aplicação web Flask que realiza análise estatística dos resultados históricos da Dupla Sena, focando especificamente na posição de cada número sorteado. A Dupla Sena sorteia 6 números de 1 a 50 em dois sorteios por concurso. Esta ferramenta analisa a frequência e distribuição dos números em cada uma das 6 posições (do menor ao maior número sorteado).
 
 ## ✨ Funcionalidades
 
+- 🌐 **Interface Web Moderna**: Interface responsiva e intuitiva usando Bootstrap
 - 🔍 **Busca de resultados**: Obtém resultados históricos diretamente da API oficial da Caixa
 - 📈 **Análise estatística por posição**: Calcula média, mediana, moda, desvio padrão e frequências
 - 🎯 **Sugestões de números**: Gera sugestões baseadas nos números mais frequentes em cada posição
-- 💾 **Armazenamento local**: Salva e carrega resultados em formato JSON
-- 📊 **Relatórios detalhados**: Exibe análises completas formatadas no console
+- 📊 **Visualização interativa**: Gráficos e tabelas para melhor compreensão dos dados
+- 🔄 **API REST**: Endpoints JSON para integração com outras aplicações
+
+## 🏗️ Arquitetura Modular
+
+```
+AnalisePorPosicao-DuplaSena/
+├── app.py                  # Aplicação Flask principal
+├── models/                 # Modelos de dados
+│   ├── __init__.py
+│   └── dupla_sena.py      # Concurso, EstatisticaPosicao
+├── services/              # Serviços de negócio
+│   ├── __init__.py
+│   ├── fetcher.py         # Busca de resultados da API
+│   └── analisador.py      # Análise estatística
+├── routes/                # Rotas da aplicação
+│   ├── __init__.py
+│   └── main.py            # Rotas principais
+├── templates/             # Templates HTML
+│   ├── base.html
+│   ├── index.html
+│   └── analise.html
+├── static/                # Arquivos estáticos
+│   ├── css/
+│   │   └── style.css
+│   └── js/
+│       ├── script.js
+│       └── analise.js
+├── requirements.txt       # Dependências
+└── README.md
+```
 
 ## 🚀 Instalação
 
@@ -34,96 +64,109 @@ cd AnalisePorPosicao-DuplaSena
 pip install -r requirements.txt
 ```
 
+3. Execute a aplicação:
+```bash
+python app.py
+```
+
+4. Acesse no navegador:
+```
+http://localhost:5000
+```
+
 ## 📖 Uso
 
-### Exemplos Básicos
+### Interface Web
 
-#### Buscar e analisar os últimos 100 concursos
+1. **Página Inicial**: Visualize o último concurso e informações sobre o sistema
+2. **Página de Análise**: Configure e execute análises personalizadas
+   - Escolha entre últimos N concursos ou intervalo específico
+   - Visualize estatísticas detalhadas por posição
+   - Obtenha sugestões baseadas em frequência histórica
+
+### API Endpoints
+
+#### Buscar último concurso
 ```bash
-python main.py --buscar 100
+GET /api/ultimo-concurso
 ```
 
-#### Buscar concursos em um intervalo específico
+#### Buscar concurso específico
 ```bash
-python main.py --buscar-range 2500 2600
+GET /api/buscar-concurso/<numero>
 ```
 
-#### Analisar dados já salvos
+#### Realizar análise
 ```bash
-python main.py --analisar resultados_dupla_sena.json
+POST /api/analisar
+Content-Type: application/json
+
+{
+  "quantidade": 50
+}
+# ou
+{
+  "inicio": 2500,
+  "fim": 2600
+}
 ```
 
-#### Exibir apenas sugestões de números
+#### Obter sugestões
 ```bash
-python main.py --analisar resultados_dupla_sena.json --sugestoes
-```
-
-### Opções da Linha de Comando
-
-```
-Argumentos:
-  --buscar N              Busca os últimos N concursos da API
-  --buscar-range I F      Busca concursos do número I até F
-  --analisar ARQUIVO      Analisa resultados de um arquivo JSON
-  --sugestoes             Exibe apenas sugestões (sem análise completa)
-  --salvar ARQUIVO        Nome do arquivo para salvar (padrão: resultados_dupla_sena.json)
-  -h, --help              Exibe ajuda
+GET /api/sugestoes?quantidade=50
 ```
 
 ## 📊 Exemplo de Saída
 
-A ferramenta exibe:
+A aplicação web exibe:
 
-1. **Estatísticas por posição**:
-   - Média dos números
-   - Mediana
-   - Moda (se houver)
-   - Desvio padrão
-   - Intervalo (mínimo e máximo)
-   - Números únicos sorteados
+1. **Dashboard Inicial**:
+   - Último concurso atualizado
+   - Navegação intuitiva
+   - Informações sobre o sistema
+
+2. **Análise Por Posição**:
+   - Configuração flexível de análise
+   - Estatísticas por posição (média, mediana, moda, desvio padrão)
    - Top 10 números mais frequentes com percentuais
+   - Visualização em abas (1º e 2º sorteio)
 
-2. **Sugestões de números**:
+3. **Sugestões de Números**:
    - Top 5 números mais frequentes para cada posição
-   - Separado por sorteio (1º e 2º sorteio)
+   - Separado por sorteio
+   - Visualização destacada
 
 ## 🔧 Módulos
 
-### `fetcher.py`
-Responsável por buscar dados da API oficial da Caixa e gerenciar o armazenamento local dos resultados.
+### `models/dupla_sena.py`
+Define os modelos de dados:
+- **Concurso**: Representa um concurso com seus sorteios
+- **EstatisticaPosicao**: Armazena estatísticas de uma posição
 
-**Principais métodos:**
-- `buscar_ultimo_concurso()`: Busca o concurso mais recente
-- `buscar_concurso(numero)`: Busca um concurso específico
-- `buscar_multiplos_concursos(inicio, fim)`: Busca múltiplos concursos
-- `salvar_resultados(arquivo)`: Salva em JSON
-- `carregar_resultados(arquivo)`: Carrega de JSON
+### `services/fetcher.py`
+Serviço de busca de dados:
+- **DuplaSenaService**: Busca resultados da API da Caixa
+- Métodos para buscar concursos individuais, múltiplos ou últimos N
+- Persistência em JSON
 
-### `analisador.py`
-Realiza a análise estatística dos números por posição.
+### `services/analisador.py`
+Serviço de análise estatística:
+- **AnalisadorService**: Realiza análises por posição
+- Calcula métricas estatísticas
+- Gera sugestões baseadas em frequência
 
-**Principais métodos:**
-- `obter_analise_completa()`: Retorna análise dos dois sorteios
-- `exibir_analise()`: Mostra análise formatada
-- `obter_sugestoes(sorteio)`: Gera sugestões por posição
-- `exibir_sugestoes(sorteio)`: Mostra sugestões formatadas
+### `routes/main.py`
+Rotas da aplicação web:
+- Páginas HTML (index, análise)
+- API REST endpoints
+- Integração com serviços
 
-### `main.py`
-Script principal que integra os módulos e fornece interface de linha de comando.
+## 📝 Tecnologias Utilizadas
 
-## 📝 Formato dos Dados
-
-Os resultados são salvos em JSON com o seguinte formato (exemplo):
-```json
-[
-  {
-    "numero": 2500,
-    "data": "01/01/2025",
-    "listaDezenas": ["05", "12", "23", "34", "41", "48"],
-    "listaDezenasSegundoSorteio": ["08", "15", "22", "31", "39", "45"]
-  }
-]
-```
+- **Backend**: Flask (Python)
+- **Frontend**: HTML5, CSS3, JavaScript
+- **UI Framework**: Bootstrap 5
+- **API**: Caixa Econômica Federal (Loterias)
 
 ## 🎲 Sobre a Dupla Sena
 
@@ -132,6 +175,25 @@ A Dupla Sena é uma loteria brasileira onde:
 - Há dois sorteios por concurso
 - Os jogadores escolhem de 6 a 15 números
 - Prêmios para acertos de 3, 4, 5 ou 6 números
+
+## 🚀 Deploy
+
+### Produção com Gunicorn
+
+```bash
+gunicorn -w 4 -b 0.0.0.0:5000 app:app
+```
+
+### Docker (opcional)
+
+```dockerfile
+FROM python:3.9-slim
+WORKDIR /app
+COPY requirements.txt .
+RUN pip install -r requirements.txt
+COPY . .
+CMD ["gunicorn", "-w", "4", "-b", "0.0.0.0:5000", "app:app"]
+```
 
 ## 📄 Licença
 

@@ -1,0 +1,134 @@
+/* Estilos personalizados para Dupla Sena */
+
+body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background-color: #f8f9fa;
+}
+
+.jumbotron {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+}
+
+.card {
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    border: none;
+    margin-bottom: 20px;
+}
+
+.card-header {
+    font-weight: bold;
+}
+
+.badge {
+    padding: 8px 12px;
+    font-size: 1.1em;
+}
+
+.estatistica-card {
+    border-left: 4px solid #007bff;
+    margin-bottom: 15px;
+}
+
+.numero-frequente {
+    display: inline-block;
+    margin: 5px;
+    padding: 10px 15px;
+    background-color: #007bff;
+    color: white;
+    border-radius: 50%;
+    font-weight: bold;
+    min-width: 50px;
+    text-align: center;
+}
+
+.posicao-header {
+    background: linear-gradient(to right, #4facfe 0%, #00f2fe 100%);
+    color: white;
+    padding: 15px;
+    border-radius: 5px;
+    margin-bottom: 20px;
+}
+
+.stat-item {
+    padding: 10px;
+    margin: 5px 0;
+    background-color: #f8f9fa;
+    border-radius: 5px;
+}
+
+.stat-label {
+    font-weight: bold;
+    color: #495057;
+}
+
+.stat-value {
+    color: #007bff;
+    font-size: 1.2em;
+}
+
+.frequencia-list {
+    list-style: none;
+    padding: 0;
+}
+
+.frequencia-item {
+    padding: 10px;
+    margin: 5px 0;
+    background-color: #e9ecef;
+    border-radius: 5px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.frequencia-numero {
+    font-weight: bold;
+    font-size: 1.3em;
+    color: #007bff;
+}
+
+.frequencia-count {
+    background-color: #007bff;
+    color: white;
+    padding: 5px 10px;
+    border-radius: 15px;
+    font-size: 0.9em;
+}
+
+.sugestao-posicao {
+    padding: 15px;
+    margin: 10px 0;
+    background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+    border-radius: 10px;
+    color: white;
+}
+
+.sugestao-numeros {
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap;
+    margin-top: 10px;
+}
+
+.sugestao-numero {
+    background-color: white;
+    color: #f5576c;
+    padding: 10px 15px;
+    border-radius: 50%;
+    font-weight: bold;
+    font-size: 1.2em;
+    min-width: 50px;
+    text-align: center;
+}
+
+@media (max-width: 768px) {
+    .jumbotron {
+        padding: 2rem 1rem;
+    }
+    
+    .badge {
+        font-size: 0.9em;
+        padding: 6px 10px;
+    }
+}
