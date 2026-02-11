@@ -1,0 +1,169 @@
+/* Loteria Federal - Estilos Customizados */
+
+:root {
+    --color-primary: #F9FBFA;
+    --color-secondary: #E5F0F6;
+    --color-accent: #0066B3;
+    --color-dark: #293d33;
+    --color-light: #ffffff;
+}
+
+body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background-color: var(--color-primary);
+}
+
+.navbar {
+    background-color: var(--color-secondary) !important;
+    border-bottom: 3px solid var(--color-accent);
+}
+
+.navbar-brand {
+    color: var(--color-accent) !important;
+    font-size: 1.5rem;
+}
+
+.nav-link {
+    color: var(--color-dark) !important;
+    font-weight: 500;
+    transition: color 0.3s;
+}
+
+.nav-link:hover {
+    color: var(--color-accent) !important;
+}
+
+.btn-primary {
+    background-color: var(--color-accent);
+    border-color: var(--color-accent);
+}
+
+.btn-primary:hover {
+    background-color: #005299;
+    border-color: #005299;
+}
+
+.card {
+    border: none;
+    border-radius: 10px;
+}
+
+.card-header {
+    border-radius: 10px 10px 0 0 !important;
+    font-weight: 600;
+}
+
+.bg-primary {
+    background-color: var(--color-accent) !important;
+}
+
+.bg-secondary {
+    background-color: #527a66 !important;
+}
+
+.text-primary {
+    color: var(--color-accent) !important;
+}
+
+/* Estilo para números da Federal */
+.numero-federal {
+    font-family: 'Courier New', monospace;
+    font-size: 2rem;
+    font-weight: bold;
+    color: var(--color-accent);
+    letter-spacing: 0.2rem;
+    background-color: var(--color-secondary);
+    padding: 0.5rem 1rem;
+    border-radius: 8px;
+    display: inline-block;
+}
+
+/* Tabelas */
+.table {
+    background-color: white;
+}
+
+.table thead {
+    background-color: var(--color-secondary);
+    color: var(--color-dark);
+}
+
+.table-hover tbody tr:hover {
+    background-color: var(--color-primary);
+}
+
+/* Footer */
+footer {
+    background-color: var(--color-secondary) !important;
+    border-top: 3px solid var(--color-accent);
+    margin-top: auto;
+}
+
+/* Badges */
+.badge {
+    font-weight: 500;
+    padding: 0.5em 0.8em;
+}
+
+/* Cards de informação */
+.card:hover {
+    transform: translateY(-5px);
+    transition: transform 0.3s ease;
+    box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1) !important;
+}
+
+/* Responsividade */
+@media (max-width: 768px) {
+    .numero-federal {
+        font-size: 1.5rem;
+        letter-spacing: 0.1rem;
+    }
+    
+    h1 {
+        font-size: 1.8rem;
+    }
+}
+
+/* Animações */
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.card {
+    animation: fadeIn 0.5s ease-in-out;
+}
+
+/* Loading spinner */
+.spinner-border {
+    width: 3rem;
+    height: 3rem;
+}
+
+/* Alerts */
+.alert {
+    border-radius: 8px;
+    border: none;
+}
+
+.alert-info {
+    background-color: var(--color-secondary);
+    color: var(--color-dark);
+}
+
+/* Print styles */
+@media print {
+    .navbar, footer, .btn {
+        display: none !important;
+    }
+    
+    .numero-federal {
+        border: 2px solid #000;
+    }
+}

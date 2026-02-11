@@ -1,0 +1,42 @@
+{% extends "base.html" %}
+
+{% block title %}Análise Estatística - Loteria Federal{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-12">
+        <h1 class="text-center mb-4">📊 Análise Estatística</h1>
+        <p class="text-center text-muted">Padrões e tendências dos números sorteados</p>
+    </div>
+</div>
+
+<div class="row mt-4">
+    <div class="col-12">
+        <div class="card shadow">
+            <div class="card-header bg-primary text-white">
+                <h5 class="mb-0">Análise em Desenvolvimento</h5>
+            </div>
+            <div class="card-body">
+                <div class="alert alert-info">
+                    <h6>Estatísticas Disponíveis:</h6>
+                    <ul>
+                        <li>Frequência de dígitos por posição (0-9)</li>
+                        <li>Números quentes e frios</li>
+                        <li>Análise de sequências</li>
+                        <li>Distribuição de somas</li>
+                        <li>Padrões de pares e ímpares</li>
+                    </ul>
+                    <p class="mb-0">Use a API <code>/api/ultimo-concurso</code> para acessar os dados.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row mt-4">
+    <div class="col-12 text-center">
+        <a href="{{ url_for('main.index') }}" class="btn btn-secondary">← Voltar</a>
+        <a href="{{ url_for('main.palpites') }}" class="btn btn-success">Gerar Palpites →</a>
+    </div>
+</div>
+{% endblock %}

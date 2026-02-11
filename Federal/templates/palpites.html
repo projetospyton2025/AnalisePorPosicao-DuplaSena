@@ -1,0 +1,129 @@
+{% extends "base.html" %}
+
+{% block title %}Gerador de Palpites - Loteria Federal{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-12">
+        <h1 class="text-center mb-4">🎯 Gerador de Palpites</h1>
+        <p class="text-center text-muted">Palpites inteligentes baseados em análise estatística</p>
+    </div>
+</div>
+
+<div class="row mt-4">
+    <div class="col-md-8 mx-auto">
+        <div class="card shadow">
+            <div class="card-header bg-success text-white">
+                <h5 class="mb-0">Gerar Novos Palpites</h5>
+            </div>
+            <div class="card-body">
+                <div class="mb-3">
+                    <label for="quantidade" class="form-label">Quantidade de palpites:</label>
+                    <select class="form-select" id="quantidade">
+                        <option value="3">3 palpites</option>
+                        <option value="5" selected>5 palpites</option>
+                        <option value="10">10 palpites</option>
+                    </select>
+                </div>
+                
+                <button id="btn-gerar" class="btn btn-success w-100">
+                    <span id="btn-text">🎲 Gerar Palpites</span>
+                    <span id="btn-loading" class="spinner-border spinner-border-sm" style="display: none;"></span>
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row mt-4" id="resultados" style="display: none;">
+    <div class="col-12">
+        <div class="card shadow">
+            <div class="card-header bg-info text-white">
+                <h5 class="mb-0">Palpites Gerados</h5>
+            </div>
+            <div class="card-body">
+                <div id="palpites-container"></div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row mt-4">
+    <div class="col-12 text-center">
+        <a href="{{ url_for('main.index') }}" class="btn btn-secondary">← Voltar</a>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+document.getElementById('btn-gerar').addEventListener('click', function() {
+    const quantidade = parseInt(document.getElementById('quantidade').value);
+    const btnText = document.getElementById('btn-text');
+    const btnLoading = document.getElementById('btn-loading');
+    const btn = document.getElementById('btn-gerar');
+    
+    // Mostra loading
+    btnText.style.display = 'none';
+    btnLoading.style.display = 'inline-block';
+    btn.disabled = true;
+    
+    // Faz requisição
+    fetch('/api/gerar-palpites', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({ quantidade: quantidade })
+    })
+    .then(response => response.json())
+    .then(data => {
+        btnText.style.display = 'inline';
+        btnLoading.style.display = 'none';
+        btn.disabled = false;
+        
+        if (data.success) {
+            mostrarPalpites(data.palpites);
+        } else {
+            alert('Erro ao gerar palpites: ' + (data.erro || 'Erro desconhecido'));
+        }
+    })
+    .catch(error => {
+        btnText.style.display = 'inline';
+        btnLoading.style.display = 'none';
+        btn.disabled = false;
+        alert('Erro ao conectar com a API: ' + error.message);
+    });
+});
+
+function mostrarPalpites(palpites) {
+    const container = document.getElementById('palpites-container');
+    container.innerHTML = '';
+    
+    palpites.forEach((palpite, index) => {
+        const card = document.createElement('div');
+        card.className = 'card mb-3';
+        card.innerHTML = `
+            <div class="card-body">
+                <div class="row align-items-center">
+                    <div class="col-md-3 text-center">
+                        <h2 class="numero-federal mb-0">${palpite.numero}</h2>
+                    </div>
+                    <div class="col-md-9">
+                        <h6 class="mb-2">
+                            <span class="badge bg-primary">${palpite.estrategia}</span>
+                            <span class="badge bg-success">${palpite.confianca}% confiança</span>
+                        </h6>
+                        <p class="mb-0 text-muted"><small>${palpite.justificativa}</small></p>
+                    </div>
+                </div>
+            </div>
+        `;
+        container.appendChild(card);
+    });
+    
+    document.getElementById('resultados').style.display = 'block';
+    document.getElementById('resultados').scrollIntoView({ behavior: 'smooth' });
+}
+</script>
+{% endblock %}
